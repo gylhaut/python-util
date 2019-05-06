@@ -14,9 +14,9 @@ import re
 
 """
 # 目标表名称 lzb_decoration_houseinfo
-table_name = 'lzb_decoration_house_info'
+table_name = 'lzb_decoration_procedure_template'
 # 原表名称
-original_table_name="DecorationHouseInfo"
+original_table_name="DecorationProcedureTemplate"
 
 print("DROP TABLE IF EXISTS {0};".format(table_name))
 print("CREATE TABLE {0} (".format(table_name))
@@ -97,8 +97,8 @@ with open('sql_server_table_source', encoding='UTF-8') as f:
               print("," + b + " " + "NOT NULL DEFAULT ''" + "COMMENT '" + str_comment.strip() + "'")
           continue
       if re.match(r'.*bit.*', prefix_line, flags=0) is not None:
-          if re.match(r'(.*bit.* NOT NULL).*', prefix_line, flags=0) is not None:
-              prefix_line = re.findall(r"(.*bit.* NOT NULL).*", prefix_line)
+          if re.match(r'(.*bit.*NOT.*NULL).*', prefix_line, flags=0) is not None:
+              prefix_line = re.findall(r"(.*bit.*NOT.*NULL).*", prefix_line)
               print("," + prefix_line[0] + " " + " DEFAULT 0 " + "COMMENT '" + str_comment.strip() + "'")
           else:
             print("," + prefix_line + " " + "NOT NULL DEFAULT 0 " + "COMMENT '" + str_comment.strip() + "'")

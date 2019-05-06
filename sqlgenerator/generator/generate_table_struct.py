@@ -14,9 +14,9 @@ import re
 从源表创建指定的MySQL建表脚本
 
 """
-with open('sql_server_table_struct', encoding='UTF-8') as f:
+with open('temp_table', encoding='UTF-8') as f:
     for line in f.readlines():
-      #print(line)
+      print(line)
       if line=='\n':
           continue
 
