@@ -1,6 +1,6 @@
 import re
-import mysql.connector
-
+#import mysql.connector
+import pymysql
 def lower_convert(str):
     new_str = ''
     for i in range(0, len(str)):
@@ -15,13 +15,13 @@ def lower_convert(str):
                 new_str = new_str + split_str1
     return new_str
 
-
-conn = mysql.connector.connect(host="192.168.1.213", user='root', password='qk365@test', database='information_schema')
+conn = pymysql.connect(host="192.168.1.213", user='root', password='qk365@test', database='information_schema')
+#conn = mysql.connector.connect(host="192.168.1.213", user='root', password='qk365@test', database='information_schema')
 #conn = mysql.connector.connect(host="127.0.0.1", user='root', password='zhoujisheng', database='information_schema',charset="utf8mb4")
 cursor = conn.cursor()
 
 table_schema = 'datacenter'
-table_name = 'pp_oa_ower_contract_ext'
+table_name = 'oa_customer_cell_report'
 
 sql = "SELECT c.COLUMN_NAME,c.DATA_TYPE,c.COLUMN_COMMENT from information_schema.columns AS c WHERE table_name = '"+table_name+"' AND table_schema = '"+table_schema+"' ORDER BY ORDINAL_POSITION "
 cursor.execute(sql)
@@ -29,12 +29,17 @@ values = cursor.fetchall()
 # 1 创建文件
 file_handle=open(lower_convert(table_name) + 'Entity.cs',mode='w',encoding = 'utf-8')
 # 2  write 写入
-file_handle.write('///<summary>\n')
-file_handle.write('/// The entity class for DB table '+table_name+'.\n')
-file_handle.write('///</summary>\n')
-file_handle.write('[Table("' + table_name + '")]\n')
-file_handle.write('public class '+lower_convert(table_name)+'Entity\n')
+file_handle.write('using System;\n')
+file_handle.write('using System.ComponentModel.DataAnnotations;\n')
+file_handle.write('using System.ComponentModel.DataAnnotations.Schema;\n')
+file_handle.write('namespace QK365.Core.DB.EntityModel\n')
 file_handle.write('{\n')
+file_handle.write('///<summary>\n')
+file_handle.write(' /// The entity class for DB table '+table_name+'.\n')
+file_handle.write(' ///</summary>\n')
+file_handle.write(' [Table("' + table_name + '")]\n')
+file_handle.write(' public class '+lower_convert(table_name)+'Entity\n')
+file_handle.write(' {\n')
 for col in values:
     file_handle.write('    ///<summary>\n')
     #print('    ///'+str(col[2].decode()))  # charset=utf8mb4
@@ -49,6 +54,8 @@ for col in values:
         cha = cha + 'string'
     elif(re.match('bigint', cha_type, flags=0) is not  None):
         cha = cha + 'long'
+    elif(re.match('tinyint',cha_type,flags=0) is not None):
+        cha = cha +'int'
     elif(re.match('int', cha_type, flags=0) is not  None):
         cha = cha + 'int'
     elif(re.match('bit', cha_type, flags=0) is not  None):
@@ -59,6 +66,7 @@ for col in values:
         cha = cha + 'DateTime'
     cha = cha + ' ' + lower_convert(col[0]) + ' { get; set; }'
     file_handle.write(cha+'\n')
+file_handle.write('}\n')
 file_handle.write('}\n')
 file_handle.close()
 print('-------------------------------SELECT------------------------------------')
