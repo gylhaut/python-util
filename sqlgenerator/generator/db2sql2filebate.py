@@ -17,7 +17,7 @@ conn = pymysql.connect(host="192.168.1.213", user='root', password='qk365@test',
 cursor = conn.cursor()
 
 table_schema = 'datacenter'
-table_name = 'oa_customer_cell_report'
+table_name = 'project_acceptance_list'
 
 sql = "SELECT c.COLUMN_NAME,c.DATA_TYPE,c.COLUMN_COMMENT FROM information_schema.columns AS c " \
       "WHERE table_name='{0}' AND table_schema='{1}' ORDER BY ORDINAL_POSITION"\

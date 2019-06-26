@@ -16,7 +16,7 @@ import re
 # 目标表名称 lzb_decoration_houseinfo
 table_name = 'lzb_decoration_procedure_template'
 # 原表名称
-original_table_name="DecorationProcedureTemplate"
+original_table_name="sql_server_table_source"
 
 print("DROP TABLE IF EXISTS {0};".format(table_name))
 print("CREATE TABLE {0} (".format(table_name))

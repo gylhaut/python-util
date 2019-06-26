@@ -1,37 +1,33 @@
-[TransactionNumber] transaction_number int NOT NULL IDENTITY(1,1) ,主键
-[ProcedureId] procedure_id uniqueidentifier NOT NULL ,工序Id
-[ProcedureNo] procedure_no nvarchar(50) NOT NULL ,工序编号
-[ProcedureName] procedure_name nvarchar(50) NOT NULL ,工序名
-[StartProcedure] start_procedure int NOT NULL ,开始工序
-[EndProcedure] end_procedure int NOT NULL ,结束工序
-[DaySpan] day_span int NOT NULL ,时间跨度
-[IsNeedAudit] is_need_audit bit NOT NULL ,是否需要审核
-[GroupNo] group_no nvarchar(50)  NOT NULL  ,所属组
-[NextGroupNo] next_group_no nvarchar(50)  NOT NULL  ,下一个所属组
-[IsEnable] is_enable bit NOT NULL ,是否启用
-[OrderType] order_type int NOT NULL ,订单类型
-[WorkIds] work_ids nvarchar(200)  NOT NULL  ,岗位
-[InDate] in_date datetime NOT NULL ,创建时间
-[InUser] in_user nvarchar(50) NOT NULL ,创建人
-[UpDate] up_date datetime NOT NULL ,修改时间
-[UpUser] up_user nvarchar(50)  NOT NULL  ,修改人
-[ProcedureType] procedure_type int NOT NULL ,是否有工作量
-[DisplayStandard] display_standard int  NOT NULL  ,
-[DisplayModel] display_model int  NOT NULL  ,
-[ts] ts bigint  NOT NULL  ,
-[CityId] city_id int NOT NULL ,城市ID
-[IsPicture] is_picture bit NOT NULL ,
-[IsVideo] is_video bit NOT NULL ,
-[IsMustFinishFlag] is_must_finish_flag int  NOT NULL  ,
-[CreatorId] creator_id bigint NOT NULL ,
-[CreateTime] create_time datetime NOT NULL ,
-[UpdateId] update_id bigint NOT NULL ,
-[IsDel] is_del bit NOT NULL ,是否删除
-[UnitPrice] unit_price decimal(18,2)  NOT NULL  ,
-[Unit] unit int  NOT NULL  ,
-[IsWorkload] is_workload bit  NOT NULL  ,
-[UpdateTime] update_time datetime NOT NULL ,
-[WorkloadCalcFormula] workload_calc_formula varchar(100)  NOT NULL  ,
-[CategoryCode] category_code varchar(100)  NOT NULL  ,
-[IsDismantle] is_dismantle bit  NOT NULL  ,
-[HasSubProcedure] has_sub_procedure bit NOT NULL ,
+[id] int NOT NULL IDENTITY(1,1) ,
+[code] varchar(20) COLLATE Chinese_PRC_CI_AS NOT NULL ,
+[project_id] int NOT NULL ,
+[cuc_id] int NOT NULL ,
+[status] int NOT NULL DEFAULT ((0)) ,
+[inspector_opinion] int NULL DEFAULT NULL ,
+[inspector_desc] varchar(1000) COLLATE Chinese_PRC_CI_AS NULL DEFAULT NULL ,
+[inspector_time] datetime NULL DEFAULT NULL ,
+[inspector_operator_id] int NOT NULL ,
+[inspector_imei] varchar(100) COLLATE Chinese_PRC_CI_AS NULL DEFAULT NULL ,
+[inspector_ip] varchar(20) COLLATE Chinese_PRC_CI_AS NULL DEFAULT NULL ,
+[market_opinion] int NULL DEFAULT NULL ,
+[market_desc] varchar(1000) COLLATE Chinese_PRC_CI_AS NULL DEFAULT NULL ,
+[market_time] datetime NULL DEFAULT NULL ,
+[market_operator_id] int NULL DEFAULT NULL ,
+[engineering_opinion] int NULL DEFAULT NULL ,
+[engineering_desc] varchar(1000) COLLATE Chinese_PRC_CI_AS NULL DEFAULT NULL ,
+[engineering_time] datetime NULL DEFAULT NULL ,
+[engineering_operator_id] int NULL DEFAULT NULL ,
+[market_engineering_opinion] int NULL DEFAULT NULL ,
+[market_engineering_desc] varchar(1000) COLLATE Chinese_PRC_CI_AS NULL DEFAULT NULL ,
+[market_engineering_time] datetime NULL DEFAULT NULL ,
+[market_engineering_operator_id] int NULL DEFAULT NULL ,
+[service_centre_opinion] int NULL DEFAULT NULL ,
+[service_centre_desc] varchar(1000) COLLATE Chinese_PRC_CI_AS NULL DEFAULT NULL ,
+[service_centre_time] datetime NULL DEFAULT NULL ,
+[service_centre_operator_id] int NULL DEFAULT NULL ,
+[network_resource] int NULL ,
+[drawings_url] varchar(255) COLLATE Chinese_PRC_CI_AS NULL ,
+[unqualified_titles] varchar(500) COLLATE Chinese_PRC_CI_AS NULL ,
+[unqualified_ids] varchar(300) COLLATE Chinese_PRC_CI_AS NULL ,
+[last_reform_finish_time] datetime NULL ,
+[ts] bigint NULL ,
