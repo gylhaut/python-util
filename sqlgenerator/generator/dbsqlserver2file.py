@@ -6,7 +6,7 @@ import types
 
 # 支持表前加前缀
 TableSpace = 'pay_'
-# 表名字
+# 原表名字
 TableName = 'billingHeader'
 
 
@@ -265,6 +265,7 @@ class MSSQL:
                 lst.append('ISNULL(' + colName + ',0) as ' + self.analyField(colName) + douhao)
             if (row[1] == "tinyint"):
                 lst.append('ISNULL(' + colName + ',0) as ' + self.analyField(colName) + douhao)
+        lst.append("0 as is_delete,")
         lst.append("GETDATE() AS sync_time,")
         lst.append("GETDATE() AS modify_time,")
         lst.append("ISNULL(t.ts, 0) AS ts")
