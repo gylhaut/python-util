@@ -5,9 +5,9 @@ import pymssql
 import types
 
 # 支持表前加前缀
-TableSpace = 'oa_'
+TableSpace = 'pay_'
 # 表名字
-TableName = 'Area'
+TableName = 'billingHeader'
 
 
 class MSSQL:
@@ -265,8 +265,11 @@ class MSSQL:
                 lst.append('ISNULL(' + colName + ',0) as ' + self.analyField(colName) + douhao)
             if (row[1] == "tinyint"):
                 lst.append('ISNULL(' + colName + ',0) as ' + self.analyField(colName) + douhao)
-        lst.append("FROM " + tablename)
-        lst.append("where 1 =2")
+        lst.append("GETDATE() AS sync_time,")
+        lst.append("GETDATE() AS modify_time,")
+        lst.append("ISNULL(t.ts, 0) AS ts")
+        lst.append("FROM " + tablename + " AS t WITH (NOLOCK)")
+        lst.append("where t.ts >= ? ")
         mscursor.close()
         return csql + "\r\n ".join(lst)
 
@@ -278,5 +281,5 @@ class MSSQL:
 
 
 if __name__ == "__main__":
-    ms = MSSQL(host="192.168.1.210", user="sa", pwd="hr05709685", db="new_HouseRent_sim")
+    ms = MSSQL(host="192.168.1.210", user="sa", pwd="hr05709685", db="payment_0611")
     ms.getAllTable()

@@ -1,6 +1,6 @@
 import re
-import mysql.connector
-
+# import mysql.connector
+import pymysql
 def lower_convert(str):
     new_str = ''
     for i in range(0, len(str)):
