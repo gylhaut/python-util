@@ -24,7 +24,7 @@ conn = pymysql.connect(host="172.16.0.126", port=3306, user='datacenterrwc', pas
 cursor = conn.cursor()
 
 table_schema = 'datacenter'
-table_name = 'pp_contract_salenum'
+table_name = 'pay_billingheader'
 
 sql = "SELECT c.COLUMN_NAME,c.DATA_TYPE,c.COLUMN_COMMENT FROM information_schema.columns AS c " \
       "WHERE table_name='{0}' AND table_schema='{1}' ORDER BY ORDINAL_POSITION"\
@@ -62,6 +62,7 @@ p_type={
     'varchar':'System.String',
     'int':'System.Int32',
     'tinyint':'System.Int32',
+    'smallint':'System.Int32',
     'bigint':'System.Int64',
     'bit':'System.Boolean',
     'decimal':'System.Decimal',
@@ -95,7 +96,7 @@ for col in values:
         douhao = ''
     print('\t', colName, 'as', lower_convert(colName), douhao)
 print('FROM', table_name)
-print('WHERE 1=2')
+print('WHERE id = @Id')
 
 print('-------------------------------INSERT------------------------------------')
 print('INSERT INTO', table_name)
@@ -126,7 +127,7 @@ for col in values:
     if (col == values[len(values)-1]):
         douhao = ''
     print('\t', colName, '=', '@'+lower_convert(colName), douhao)
-print('WHERE 1=2')
+print('WHERE id = @Id')
 
 
 cursor.close()
