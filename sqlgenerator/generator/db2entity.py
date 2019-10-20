@@ -24,7 +24,7 @@ conn = pymysql.connect(host="172.16.0.126", port=3306, user='datacenterrwc', pas
 cursor = conn.cursor()
 
 table_schema = 'datacenter'
-table_name = 'pay_billingheader'
+table_name = 'ppp_special_sales_kpi'
 
 sql = "SELECT c.COLUMN_NAME,c.DATA_TYPE,c.COLUMN_COMMENT FROM information_schema.columns AS c " \
       "WHERE table_name='{0}' AND table_schema='{1}' ORDER BY ORDINAL_POSITION"\
@@ -67,6 +67,7 @@ p_type={
     'bit':'System.Boolean',
     'decimal':'System.Decimal',
     'datetime':'System.DateTime',
+     'date': 'System.DateTime',
 }
 
 for col in values:
