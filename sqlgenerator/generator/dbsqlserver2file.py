@@ -5,9 +5,9 @@ import pymssql
 import types
 
 # 支持表前加前缀
-TableSpace = 'pay_'
+TableSpace = 'oa_'
 # 原表名字
-TableName = 'billingHeader'
+TableName = 'oc_modify_approval_tb'
 
 
 class MSSQL:
@@ -132,7 +132,7 @@ class MSSQL:
                     lst.append(field + " INT NOT NULL DEFAULT 0 COMMENT '" + row[6].replace("/r/n[0-9]", " ") + "'")
             if (row[1] == "bigint"):
                 lst.append(field + " bigint(20) NOT NULL COMMENT '" + row[6].replace("/r/n[0-9]", " ") + "'")
-            if (row[1] == "varchar"):
+            if (row[1] == "varchar" or row[1] == "nvarchar"):
                 if (len(lst) <= 0):
                     lst.append(
                         field + " varchar(" + str(row[2]) + ")  NOT NULL DEFAULT '' COMMENT '" + row[6].replace("/r/n",
@@ -253,7 +253,7 @@ class MSSQL:
                 lst.append('ISNULL(' + colName + ',0) as ' + self.analyField(colName) + douhao)
             if (row[1] == "bigint"):
                 lst.append('ISNULL(' + colName + ',0) as ' + self.analyField(colName) + douhao)
-            if (row[1] == "varchar"):
+            if (row[1] == "varchar" or row[1] == "nvarchar"):
                 lst.append('ISNULL(' + colName + ',\'\') as ' + self.analyField(colName) + douhao)
             if (row[1] == "text"):
                 lst.append('ISNULL(' + colName + ','') as ' + self.analyField(colName) + douhao)
@@ -282,5 +282,5 @@ class MSSQL:
 
 
 if __name__ == "__main__":
-    ms = MSSQL(host="192.168.1.210", user="sa", pwd="hr05709685", db="payment_0611")
+    ms = MSSQL(host="192.168.1.4", user="aotest", pwd="vPl2r7lNBrErAUtihoGs", db="new_HouseRent_aotest")
     ms.getAllTable()
