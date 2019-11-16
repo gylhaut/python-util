@@ -7,8 +7,38 @@ import types
 # 支持表前加前缀
 TableSpace = 'oa_'
 # 原表名字
-TableName = 'oc_modify_approval_tb'
+TableName = 'students'
 
+p_type = {
+    'bigint': 'bigint',
+    'binary': 'binary',
+    'bit': 'tinyint',
+    'char': 'char',
+    'date': 'date',
+    'datetime': 'datetime',
+    'datetime2': 'datetime',
+    'datetimeoffset': 'datetime',
+    'decimal': 'decimal',
+    'float': 'float',
+    'int': 'int',
+    'money': 'float',
+    'nchar': 'char',
+    'ntext': 'text',
+    'numeric': 'decimal',
+    'nvarchar': 'varchar',
+    'real': 'float',
+    'smalldatetime': 'datetime',
+    'smallint': 'smallint',
+    'smallmoney': 'float',
+    'text': 'text',
+    'time': 'time',
+    'timestamp': 'timestamp',
+    'tinyint': 'tinyint',
+    'uniqueidentifier': 'varchar(40)',
+    'varbinary': 'varbinary',
+    'varchar': 'varchar',
+    'xml': 'text'
+}
 
 class MSSQL:
     def __init__(self, host, user, pwd, db):
@@ -78,8 +108,8 @@ class MSSQL:
             mscursor.close()
             return
         for row in table:
-            sqlext = self.createTable(row[0])
-            print(sqlext)
+            #sqlext = self.createTable(row[0])
+            #print(sqlext)
 
             sqlselect = self.selectTable(row[0])
             print(sqlselect)
@@ -87,6 +117,7 @@ class MSSQL:
 
     def createTable(self, tablename):
         mscursor = self.__GetConnect()
+        '''
         sql = (
             "SELECT A.NAME AS COLUMNNAME,C.NAME,A.LENGTH,B.NAME AS TABLENAME,ISNULL(D.PKS,0) AS PKEY,E.CT,isnull(G.[value],'')" \
             " FROM SYSCOLUMNS A RIGHT JOIN  SYSOBJECTS B ON A.ID=B.ID " \
@@ -104,8 +135,43 @@ class MSSQL:
             " ON B.NAME=E.TABLENAME " \
             " LEFT join sys.extended_properties G " \
             " on A.id=G.major_id and A.colid=G.minor_id " \
-            " WHERE B.TYPE='U'  AND B.NAME=%s AND B.NAME NOT IN ('dtproperties') ")
-        mscursor.execute(sql, (tablename, tablename, tablename, tablename))
+            " WHERE B.TYPE='U'  AND B.NAME='{0}' AND B.NAME NOT IN ('dtproperties') ")
+        '''
+        sql = '''SELECT
+            字段序号 = a.colorder,
+            字段名 = a.name,
+            类型 = b.name,
+          字段说明 = isnull(g.[value], ''),
+          占用字节数 = a.length,
+          小数位数 = isnull(COLUMNPROPERTY(a.id, a.name, 'Scale'),0),
+          主键 = CASE WHEN EXISTS ( SELECT 1
+            FROM  sysobjects
+            WHERE xtype = 'PK' AND parent_obj = a.id
+            AND name IN (
+                SELECT name FROM sysindexes
+                WHERE indid IN ( SELECT indid
+                        FROM sysindexkeys
+                        WHERE id = a.id AND colid = a.colid)
+            )
+         ) THEN 1 ELSE 0 END,
+          长度 = COLUMNPROPERTY(a.id, a.name, 'PRECISION'),
+          表名 = d.NAME 
+        FROM
+            syscolumns a
+        INNER JOIN sysobjects d ON a.id = d.id
+        AND d.xtype = 'U'
+        AND d.name <> 'dtproperties'
+        LEFT JOIN systypes b ON a.xusertype = b.xusertype
+        LEFT JOIN syscomments e ON a.cdefault = e.id
+        LEFT JOIN sys.extended_properties g ON a.id = G.major_id
+        AND a.colid = g.minor_id
+        LEFT JOIN sys.extended_properties f ON d.id = f.major_id
+        AND f.minor_id = 0
+        WHERE d.name = %s
+        ORDER BY
+            a.colorder
+        '''
+        mscursor.execute(sql, tablename)
         table = mscursor.fetchall()
         if (table is None or len(table) <= 0):
             mscursor.close()
@@ -115,6 +181,7 @@ class MSSQL:
         lst = []
         for row in table:
             field = self.analyField(row[0])
+            #print(field)
             if (row[1] == "int"):
                 if (row[4] == 1 and len(lst) <= 0 and row[5] == 1):
                     lst.append(field + " bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键'")
@@ -220,26 +287,42 @@ class MSSQL:
         return resList
 
     def selectTable(self, tablename):
-        mscursor = self.__GetConnect()
-        sql = (
-            "SELECT A.NAME AS COLUMNNAME,C.NAME,A.LENGTH,B.NAME AS TABLENAME,ISNULL(D.PKS,0) AS PKEY,E.CT,isnull(G.[value],'')" \
-            " FROM SYSCOLUMNS A RIGHT JOIN  SYSOBJECTS B ON A.ID=B.ID " \
-            " LEFT JOIN SYSTYPES C ON C.XTYPE=A.XTYPE LEFT JOIN " \
-            " (SELECT A.NAME,1 AS PKS FROM SYSCOLUMNS A " \
-            " JOIN SYSINDEXKEYS B ON A.ID=B.ID AND A.COLID=B.COLID AND A.ID=OBJECT_ID(%s)" \
-            " JOIN SYSINDEXES C ON A.ID=C.ID AND B.INDID=C.INDID " \
-            " JOIN SYSOBJECTS D ON C.NAME=D.NAME AND D.XTYPE='PK') D " \
-            " ON A.NAME =D.NAME " \
-            " LEFT JOIN (SELECT COUNT(A.COLUMNNAME) AS CT,%s AS TABLENAME  FROM " \
-            " (SELECT A.NAME AS COLUMNNAME,D.NAME AS TABLENAME FROM SYSCOLUMNS A " \
-            " JOIN SYSINDEXKEYS B ON A.ID=B.ID AND A.COLID=B.COLID AND A.ID=OBJECT_ID(%s) " \
-            " JOIN SYSINDEXES C ON A.ID=C.ID AND B.INDID=C.INDID " \
-            " JOIN SYSOBJECTS D ON C.NAME=D.NAME AND D.XTYPE='PK') A GROUP BY A.TABLENAME) E " \
-            " ON B.NAME=E.TABLENAME " \
-            " LEFT join sys.extended_properties G " \
-            " on A.id=G.major_id and A.colid=G.minor_id " \
-            " WHERE B.TYPE='U'  AND B.NAME=%s AND B.NAME NOT IN ('dtproperties') ")
-        mscursor.execute(sql, (tablename, tablename, tablename, tablename))
+        mscursor = self.__GetConnect();
+        sql = '''SELECT
+                    字段序号 = a.colorder,
+                    字段名 = a.name,
+                    类型 = b.name,
+                  字段说明 = isnull(g.[value], ''),
+                  占用字节数 = a.length,
+                  小数位数 = isnull(COLUMNPROPERTY(a.id, a.name, 'Scale'),0),
+                  主键 = CASE WHEN EXISTS ( SELECT 1
+                    FROM  sysobjects
+                    WHERE xtype = 'PK' AND parent_obj = a.id
+                    AND name IN (
+                        SELECT name FROM sysindexes
+                        WHERE indid IN ( SELECT indid
+                                FROM sysindexkeys
+                                WHERE id = a.id AND colid = a.colid)
+                    )
+                 ) THEN 1 ELSE 0 END,
+                  长度 = COLUMNPROPERTY(a.id, a.name, 'PRECISION'),
+                  表名 = d.NAME 
+                FROM
+                    syscolumns a
+                INNER JOIN sysobjects d ON a.id = d.id
+                AND d.xtype = 'U'
+                AND d.name <> 'dtproperties'
+                LEFT JOIN systypes b ON a.xusertype = b.xusertype
+                LEFT JOIN syscomments e ON a.cdefault = e.id
+                LEFT JOIN sys.extended_properties g ON a.id = G.major_id
+                AND a.colid = g.minor_id
+                LEFT JOIN sys.extended_properties f ON d.id = f.major_id
+                AND f.minor_id = 0
+                WHERE d.name = %s
+                ORDER BY
+                    a.colorder
+                '''
+        mscursor.execute(sql, (tablename))
         table = mscursor.fetchall()
         if (table is None or len(table) <= 0):
             mscursor.close()
@@ -282,5 +365,6 @@ class MSSQL:
 
 
 if __name__ == "__main__":
-    ms = MSSQL(host="192.168.1.4", user="aotest", pwd="vPl2r7lNBrErAUtihoGs", db="new_HouseRent_aotest")
+    # ms = MSSQL(host="192.168.1.4", user="aotest", pwd="vPl2r7lNBrErAUtihoGs", db="new_HouseRent_aotest")
+    ms = MSSQL(host="127.0.0.1", user="sa", pwd="123456", db="test")
     ms.getAllTable()

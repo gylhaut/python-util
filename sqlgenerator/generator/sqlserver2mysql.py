@@ -6,7 +6,7 @@ import types
 TableSpace='ABS.'
 class SyncDataBase():
     def __init__(self):
-        self.pgconn=psycopg2.connect("dbname=absob host=192.168.1.32 user=postgres password=12345")
+        #self.pgconn=psycopg2.connect("dbname=absob host=192.168.1.32 user=postgres password=12345")
         self.msconn=pymssql.connect(host="192.168.1.20",user="sa",password="sa",database="absOB090615")
     def commit(self):
         self.pgconn.commit()
@@ -30,7 +30,7 @@ class SyncDataBase():
             for row in table:
                 #print row[1]
                 self.executeTable(row[1],row[0])
-                print "%s is execute success"%row[1]
+                print("%s is execute success"%row[1])
     def executeTable(self,tablename,count):
         #print tablename
         sql1="SELECT * FROM %s"%tablename
@@ -87,7 +87,7 @@ class SyncDataBase():
         if(table is None or len(table)<=0):
             mscursor.close()
             return
-        lst_result=initColumn(table)
+       # lst_result=initColumn(table)
         mscursor.close()
         pgcursor=self.pgconn.cursor()
         ret=pgcursor.executemany("INSERT INTO "+TableSpace+"BBULLETIN VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",lst_result)
@@ -191,14 +191,5 @@ class SyncDataBase():
         return csql+" ".join(lst)
 if __name__=="__main__":
     sdb=SyncDataBase()
-    try:
-        #print sdb.initPgSql("aaa",10)
-        #sdb.getAllTable()
-        sdb.exesyncdb()
-    except Exception,e:
-        print e
-        sdb.rollback()
-    else:
-        sdb.commit()
+    sdb.exesyncdb()
     sdb.close()
-    print "ok........"
